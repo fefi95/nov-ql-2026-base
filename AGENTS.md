@@ -22,6 +22,8 @@ Requires Node.js >= 22.20.0.
 
 CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run lint`, `npm test` and `npm run build` on every push and pull request to `main`. Run the same commands locally before declaring a task finished.
 
+On every push to `main`, the same workflow deploys the build to GitHub Pages (`https://fefi95.github.io/nov-ql-2026-base/`), and only if verification passed. Pull requests never deploy. The production build uses the base path `/nov-ql-2026-base/` (see `vite.config.js`).
+
 ## Code design
 
 - **Functional style.** Prefer pure functions, immutable data and expressions over mutation and loops with side effects. Keep side effects (DOM, randomness, I/O) at the edges.

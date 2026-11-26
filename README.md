@@ -20,6 +20,12 @@ Los tickets de cada reto están en [`instrucciones/`](instrucciones/):
 | #2   | [`tarea-2/`](instrucciones/tarea-2/)                   | Guard rails y Spec Driven Development         |
 | #3   | [`tarea-3-optional/`](instrucciones/tarea-3-optional/) | Backend e historial _(opcional)_              |
 
+## Aplicación publicada
+
+https://fefi95.github.io/nov-ql-2026-base/
+
+Se despliega sola en GitHub Pages con cada `push` a `main`, solo si el linter y las pruebas pasan. Los pull requests únicamente ejecutan las verificaciones. Para habilitarlo en un repositorio nuevo: _Settings → Pages → Source: GitHub Actions_.
+
 ## Primeros pasos
 
 ```sh
