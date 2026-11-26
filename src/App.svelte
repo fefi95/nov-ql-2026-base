@@ -1,28 +1,38 @@
 <script>
   import ParticipantForm from './components/ParticipantForm.svelte';
   import ParticipantList from './components/ParticipantList.svelte';
+  import WinnerCountSelector from './components/WinnerCountSelector.svelte';
   import DrawButton from './components/DrawButton.svelte';
+  import DrawError from './components/DrawError.svelte';
   import WinnerCard from './components/WinnerCard.svelte';
+  import Podium from './components/Podium.svelte';
   import { addParticipant, removeParticipant } from './lib/participants.js';
-  import { drawWinner } from './lib/draw.js';
+  import { drawResult } from './lib/draw.js';
 
   let { random = Math.random } = $props();
 
   let participants = $state([]);
-  let winner = $state(null);
+  let winnerCount = $state(1);
+  // null | { type: 'error', message } | { type: 'winners', winners }
+  let result = $state(null);
 
   function handleAdd(name) {
     participants = addParticipant(participants, name);
-    winner = null;
+    result = null;
   }
 
   function handleRemove(index) {
     participants = removeParticipant(participants, index);
-    winner = null;
+    result = null;
+  }
+
+  function handleWinnerCountChange(count) {
+    winnerCount = count;
+    result = null;
   }
 
   function handleDraw() {
-    winner = drawWinner(participants, random);
+    result = drawResult(participants, winnerCount, random);
   }
 </script>
 
@@ -31,10 +41,15 @@
 
   <ParticipantForm onadd={handleAdd} />
   <ParticipantList {participants} onremove={handleRemove} />
-  <DrawButton disabled={participants.length === 0} ondraw={handleDraw} />
+  <WinnerCountSelector value={winnerCount} onchange={handleWinnerCountChange} />
+  <DrawButton ondraw={handleDraw} />
 
-  {#if winner}
-    <WinnerCard {winner} />
+  {#if result?.type === 'error'}
+    <DrawError message={result.message} />
+  {:else if result?.type === 'winners' && result.winners.length === 1}
+    <WinnerCard winner={result.winners[0]} />
+  {:else if result?.type === 'winners'}
+    <Podium winners={result.winners} />
   {/if}
 </main>
 

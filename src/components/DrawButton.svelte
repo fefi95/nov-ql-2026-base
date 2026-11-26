@@ -1,5 +1,5 @@
 <script>
-  let { disabled, ondraw } = $props();
+  let { disabled = false, ondraw } = $props();
 </script>
 
 <button type="button" {disabled} onclick={ondraw}>Sortear ganador</button>
