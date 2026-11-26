@@ -10,7 +10,8 @@ const addParticipants = async (...names) => {
 };
 
 const drawButton = () => screen.getByRole('button', { name: 'Sortear ganador' });
-const chooseWinnerCount = (count) => userEvent.click(screen.getByRole('radio', { name: `${count}` }));
+const chooseWinnerCount = (count) =>
+  userEvent.click(screen.getByRole('radio', { name: `${count}` }));
 const podiumPlaces = () =>
   screen.getAllByRole('listitem').flatMap((item) => item.getAttribute('aria-label') ?? []);
 

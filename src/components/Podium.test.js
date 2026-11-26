@@ -10,7 +10,11 @@ describe('Podium', () => {
     render(Podium, { winners: ['Ana', 'Luis', 'Eva'] });
 
     expect(screen.getByText('¡Tenemos un podio!')).toBeInTheDocument();
-    expect(placesFromLeftToRight()).toEqual(['2.º lugar: Luis', '1.er lugar: Ana', '3.er lugar: Eva']);
+    expect(placesFromLeftToRight()).toEqual([
+      '2.º lugar: Luis',
+      '1.er lugar: Ana',
+      '3.er lugar: Eva',
+    ]);
     expect(screen.getByText('🥇')).toBeInTheDocument();
     expect(screen.getByText('🥈')).toBeInTheDocument();
     expect(screen.getByText('🥉')).toBeInTheDocument();

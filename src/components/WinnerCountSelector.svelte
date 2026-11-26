@@ -6,7 +6,7 @@
 
 <fieldset>
   <legend>Cantidad de ganadores</legend>
-  {#each options as option}
+  {#each options as option (option)}
     <label>
       <input
         type="radio"
