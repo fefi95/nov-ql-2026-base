@@ -4,15 +4,17 @@
 
 {#if participants.length > 0}
   <ul>
-    {#each participants as participant, index}
+    {#each participants as participant, index (index)}
       <li>
         <span>{participant}</span>
         <button
           type="button"
           class="remove"
           aria-label="Quitar {participant}"
-          onclick={() => onremove(index)}>✕</button
+          onclick={() => onremove(index)}
         >
+          ✕
+        </button>
       </li>
     {/each}
   </ul>

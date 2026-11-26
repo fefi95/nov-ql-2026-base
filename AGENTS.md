@@ -16,10 +16,11 @@ Requires Node.js >= 22.20.0.
 - `npm run dev`: start the dev server at http://localhost:5173
 - `npm run build`: production build into `dist/`
 - `npm run preview`: serve the production build
-
 - `npm test`: run the test suite once (Vitest + Testing Library, jsdom)
+- `npm run lint`: run ESLint (with `eslint-plugin-svelte`) and `prettier --check`; fails on any error or unformatted file
+- `npm run format`: format all files with Prettier and apply ESLint auto-fixes
 
-There is no lint script yet. When one is added, document it here.
+CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run lint`, `npm test` and `npm run build` on every push and pull request to `main`. Run the same commands locally before declaring a task finished.
 
 ## Code design
 
@@ -38,7 +39,9 @@ There is no lint script yet. When one is added, document it here.
 - Every change in behavior includes automated tests. A task is not done if tests fail or are missing.
 - Test the pure logic (adding or removing participants, drawing a winner) with unit tests, injecting a deterministic random generator.
 - Test components through what the user sees and does, not through their internals.
-- Run the full test suite before declaring a task finished.
+- Tests must be deterministic: no real randomness and no real waits.
+- `src/theme.test.js` checks that the orange base color lives in `src/app.css` and that components use only `var(--…)` colors.
+- Run the full test suite and the linter before declaring a task finished.
 
 ## What the AI must not do
 
