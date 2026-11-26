@@ -2,6 +2,11 @@
   --color-base: #f97316;
   --color-base-dark: #c2410c;
   --color-base-light: #ffedd5;
+  --color-base-lighter-hover: #fed7aa;
+  --color-page-end: #fff7ed;
+  --color-surface: #ffffff;
+  --color-on-base: #ffffff;
+  --color-shadow: rgb(194 65 12 / 0.15);
   --color-text: #1f2937;
   --color-muted: #6b7280;
 }
@@ -15,7 +20,7 @@ body {
   min-height: 100vh;
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   color: var(--color-text);
-  background: linear-gradient(160deg, var(--color-base-light), #fff7ed);
+  background: linear-gradient(160deg, var(--color-base-light), var(--color-page-end));
 }
 
 #app {
