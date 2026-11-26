@@ -1,5 +1,5 @@
 <script>
-  let { participants, onremove } = $props();
+  let { participants, onremove, locked = false } = $props();
 </script>
 
 {#if participants.length > 0}
@@ -11,6 +11,7 @@
           type="button"
           class="remove"
           aria-label="Quitar {participant}"
+          disabled={locked}
           onclick={() => onremove(index)}
         >
           ✕
@@ -50,6 +51,11 @@
     background: none;
     color: var(--color-base-dark);
     padding: 0.2rem 0.5rem;
+  }
+
+  .remove:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   .empty {

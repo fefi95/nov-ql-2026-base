@@ -25,4 +25,17 @@ describe('ParticipantList', () => {
 
     expect(onremove).toHaveBeenCalledWith(1);
   });
+
+  it('disables the remove buttons while locked', async () => {
+    const onremove = vi.fn();
+    render(ParticipantList, { participants: ['Ana', 'Luis'], onremove, locked: true });
+
+    const remove = screen.getByRole('button', { name: 'Quitar Luis' });
+    expect(remove).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Quitar Ana' })).toBeDisabled();
+
+    await userEvent.click(remove);
+
+    expect(onremove).not.toHaveBeenCalled();
+  });
 });

@@ -24,4 +24,18 @@ describe('ParticipantForm', () => {
 
     expect(onadd).toHaveBeenCalledWith('Luis');
   });
+
+  it('disables the field and the button while locked', () => {
+    render(ParticipantForm, { onadd: vi.fn(), locked: true });
+
+    expect(screen.getByLabelText('Nombre del participante')).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Agregar' })).toBeDisabled();
+  });
+
+  it('is enabled by default', () => {
+    render(ParticipantForm, { onadd: vi.fn() });
+
+    expect(screen.getByLabelText('Nombre del participante')).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Agregar' })).toBeEnabled();
+  });
 });

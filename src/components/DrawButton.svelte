@@ -1,8 +1,8 @@
 <script>
-  let { disabled, ondraw } = $props();
+  let { disabled = false, locked = false, ondraw } = $props();
 </script>
 
-<button type="button" {disabled} onclick={ondraw}>Sortear ganador</button>
+<button type="button" disabled={disabled || locked} onclick={ondraw}>Sortear ganador</button>
 
 <style>
   button {
