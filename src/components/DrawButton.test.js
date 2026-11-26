@@ -16,6 +16,12 @@ describe('DrawButton', () => {
     expect(screen.getByRole('button', { name: 'Sortear ganador' })).toBeEnabled();
   });
 
+  it('is disabled while locked', () => {
+    render(DrawButton, { locked: true, ondraw: vi.fn() });
+
+    expect(screen.getByRole('button', { name: 'Sortear ganador' })).toBeDisabled();
+  });
+
   it('calls ondraw when clicked', async () => {
     const ondraw = vi.fn();
     render(DrawButton, { disabled: false, ondraw });

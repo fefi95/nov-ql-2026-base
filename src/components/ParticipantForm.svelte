@@ -1,5 +1,5 @@
 <script>
-  let { onadd } = $props();
+  let { onadd, locked = false } = $props();
   let name = $state('');
 
   function submit(event) {
@@ -15,8 +15,9 @@
     placeholder="Nombre del participante"
     aria-label="Nombre del participante"
     bind:value={name}
+    disabled={locked}
   />
-  <button type="submit" class="secondary">Agregar</button>
+  <button type="submit" class="secondary" disabled={locked}>Agregar</button>
 </form>
 
 <style>
@@ -49,7 +50,13 @@
     color: var(--color-base-dark);
   }
 
-  .secondary:hover {
+  input:disabled,
+  .secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .secondary:hover:not(:disabled) {
     background: var(--color-base-lighter-hover);
   }
 </style>

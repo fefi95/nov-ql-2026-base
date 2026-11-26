@@ -3,48 +3,66 @@
   import ParticipantList from './components/ParticipantList.svelte';
   import WinnerCountSelector from './components/WinnerCountSelector.svelte';
   import DrawButton from './components/DrawButton.svelte';
+  import Countdown from './components/Countdown.svelte';
   import DrawError from './components/DrawError.svelte';
   import WinnerCard from './components/WinnerCard.svelte';
   import Podium from './components/Podium.svelte';
   import { addParticipant, removeParticipant } from './lib/participants.js';
-  import { drawResult } from './lib/draw.js';
+  import { drawWinners, validateDraw } from './lib/draw.js';
+  import { COUNTDOWN_STEP_MS } from './lib/countdown.js';
+  import { IDLE, isCounting, startDraw, tickDraw, visibleResult } from './lib/drawPhase.js';
+  import { intervalScheduler } from './lib/scheduler.js';
 
-  let { random = Math.random } = $props();
+  let { random = Math.random, scheduler = intervalScheduler } = $props();
 
   let participants = $state([]);
   let winnerCount = $state(1);
-  // null | { type: 'error', message } | { type: 'winners', winners }
-  let result = $state(null);
+  let draw = $state(IDLE);
+
+  const locked = $derived(isCounting(draw));
+  const result = $derived(visibleResult(draw));
+
+  // Depends only on `locked`, so the timer starts once per countdown and is
+  // cancelled when the countdown ends or the component is destroyed.
+  $effect(() => {
+    if (!locked) return;
+    const id = scheduler.setInterval(() => {
+      draw = tickDraw(draw);
+    }, COUNTDOWN_STEP_MS);
+    return () => scheduler.clearInterval(id);
+  });
 
   function handleAdd(name) {
     participants = addParticipant(participants, name);
-    result = null;
+    draw = IDLE;
   }
 
   function handleRemove(index) {
     participants = removeParticipant(participants, index);
-    result = null;
+    draw = IDLE;
   }
 
-  function handleWinnerCountChange(count) {
+  function handleWinnerCount(count) {
     winnerCount = count;
-    result = null;
+    draw = IDLE;
   }
 
   function handleDraw() {
-    result = drawResult(participants, winnerCount, random);
+    draw = startDraw({ participants, winnerCount, random, validateDraw, drawWinners });
   }
 </script>
 
 <main>
   <h1>🎲 Selector de ganadores</h1>
 
-  <ParticipantForm onadd={handleAdd} />
-  <ParticipantList {participants} onremove={handleRemove} />
-  <WinnerCountSelector value={winnerCount} onchange={handleWinnerCountChange} />
-  <DrawButton ondraw={handleDraw} />
+  <ParticipantForm onadd={handleAdd} {locked} />
+  <ParticipantList {participants} onremove={handleRemove} {locked} />
+  <WinnerCountSelector value={winnerCount} onchange={handleWinnerCount} {locked} />
+  <DrawButton ondraw={handleDraw} {locked} />
 
-  {#if result?.type === 'error'}
+  {#if draw.phase === 'counting'}
+    <Countdown count={draw.count} />
+  {:else if result?.type === 'error'}
     <DrawError message={result.message} />
   {:else if result?.type === 'winners' && result.winners.length === 1}
     <WinnerCard winner={result.winners[0]} />

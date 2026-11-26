@@ -1,10 +1,10 @@
 <script>
-  let { value = 1, onchange } = $props();
+  let { value = 1, onchange, locked = false } = $props();
 
   const options = [1, 2, 3];
 </script>
 
-<fieldset>
+<fieldset disabled={locked}>
   <legend>Cantidad de ganadores</legend>
   {#each options as option (option)}
     <label>
@@ -58,7 +58,12 @@
     color: var(--color-base-dark);
   }
 
-  label:hover span {
+  fieldset:disabled label {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  fieldset:not(:disabled) label:hover span {
     background: var(--color-base-lighter-hover);
   }
 

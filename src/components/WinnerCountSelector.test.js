@@ -27,4 +27,16 @@ describe('WinnerCountSelector', () => {
 
     expect(onchange).toHaveBeenCalledWith(2);
   });
+
+  it('cannot be changed while locked', async () => {
+    const onchange = vi.fn();
+    render(WinnerCountSelector, { value: 1, onchange, locked: true });
+
+    const two = screen.getByRole('radio', { name: '2' });
+    expect(two).toBeDisabled();
+
+    await userEvent.click(two);
+
+    expect(onchange).not.toHaveBeenCalled();
+  });
 });
