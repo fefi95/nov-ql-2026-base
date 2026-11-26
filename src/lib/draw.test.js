@@ -1,56 +1,93 @@
 import { describe, expect, it } from 'vitest';
-import { drawWinner } from './draw.js';
+import { drawResult, drawWinners, validateDraw } from './draw.js';
 
-const participants = ['Ana', 'Luis', 'Eva'];
+const participants = ['Ana', 'Luis', 'Eva', 'Juan', 'Sara'];
 
-// Covers both ends of Math.random's [0, 1) range plus values in between.
-const randomValues = [0, 0.1, 0.25, 0.5, 0.75, 0.9, 0.999999, 1 - Number.EPSILON];
+// Returns the given values in order, then repeats the last one.
+const sequence =
+  (...values) =>
+  () =>
+    values.length > 1 ? values.shift() : values[0];
 
-const listOfSize = (size) => Array.from({ length: size }, (_, i) => `Participante ${i + 1}`);
-
-const listSizes = [1, 2, 3, 7, 10, 100];
-
-describe('drawWinner', () => {
-  it('returns null when there are no participants', () => {
-    expect(drawWinner([], () => 0.5)).toBeNull();
+describe('drawWinners', () => {
+  it('returns exactly the requested number of winners', () => {
+    expect(drawWinners(participants, 1, () => 0.5)).toHaveLength(1);
+    expect(drawWinners(participants, 2, () => 0.5)).toHaveLength(2);
+    expect(drawWinners(participants, 3, () => 0.5)).toHaveLength(3);
   });
 
-  it('never draws a winner from an empty list, whatever the random value', () => {
-    randomValues.forEach((value) => {
-      expect(drawWinner([], () => value)).toBeNull();
+  it('picks the entries selected by the random generator, in order of place', () => {
+    expect(drawWinners(participants, 1, () => 0)).toEqual(['Ana']);
+    expect(drawWinners(participants, 3, sequence(0.5, 0, 0.999))).toEqual(['Eva', 'Ana', 'Sara']);
+  });
+
+  it('never repeats an entry, whatever the generator returns', () => {
+    [0, 0.25, 0.5, 0.75, 0.999].forEach((value) => {
+      const winners = drawWinners(participants, 3, () => value);
+      expect(new Set(winners).size).toBe(3);
+      winners.forEach((winner) => expect(participants).toContain(winner));
     });
   });
 
-  it('picks the participant selected by the random generator', () => {
-    expect(drawWinner(participants, () => 0)).toBe('Ana');
-    expect(drawWinner(participants, () => 0.5)).toBe('Luis');
-    expect(drawWinner(participants, () => 0.999)).toBe('Eva');
+  it('treats repeated names as different entries', () => {
+    const winners = drawWinners(['Ana', 'Ana', 'Luis'], 2, () => 0);
+
+    expect(winners).toEqual(['Ana', 'Ana']);
   });
 
-  it('always returns a single participant from the list', () => {
-    listSizes.forEach((size) => {
-      const list = listOfSize(size);
-      randomValues.forEach((value) => {
-        const winner = drawWinner(list, () => value);
+  it('lets each entry win at most once when names repeat', () => {
+    const winners = drawWinners(['Ana', 'Ana'], 3, () => 0);
 
-        expect(typeof winner).toBe('string');
-        expect(list).toContain(winner);
-      });
+    expect(winners).toEqual(['Ana', 'Ana']);
+  });
+
+  it('does not mutate the original list', () => {
+    const list = ['Ana', 'Luis', 'Eva'];
+    drawWinners(list, 2, () => 0);
+    expect(list).toEqual(['Ana', 'Luis', 'Eva']);
+  });
+});
+
+describe('validateDraw', () => {
+  it('rejects a draw without participants', () => {
+    expect(validateDraw(0, 1)).toEqual({
+      valid: false,
+      message: 'Se necesitan al menos 2 participantes para sortear 1 ganador(es).',
     });
   });
 
-  it('gives every participant a chance to win', () => {
-    const list = listOfSize(4);
-    const winners = [0, 0.25, 0.5, 0.75].map((value) => drawWinner(list, () => value));
-
-    expect(winners).toEqual(list);
+  it('rejects a draw with a single participant', () => {
+    expect(validateDraw(1, 1)).toEqual({
+      valid: false,
+      message: 'Se necesitan al menos 2 participantes para sortear 1 ganador(es).',
+    });
   });
 
-  it('does not mutate the list', () => {
-    const list = [...participants];
+  it('rejects as many winners as participants', () => {
+    expect(validateDraw(3, 3)).toEqual({
+      valid: false,
+      message: 'Se necesitan al menos 4 participantes para sortear 3 ganador(es).',
+    });
+  });
 
-    drawWinner(list, () => 0.5);
+  it('accepts fewer winners than participants', () => {
+    expect(validateDraw(2, 1)).toEqual({ valid: true });
+    expect(validateDraw(4, 3)).toEqual({ valid: true });
+  });
+});
 
-    expect(list).toEqual(participants);
+describe('drawResult', () => {
+  it('returns the winners when the draw is valid', () => {
+    expect(drawResult(participants, 2, () => 0)).toEqual({
+      type: 'winners',
+      winners: ['Ana', 'Luis'],
+    });
+  });
+
+  it('returns the error message when the draw is not valid', () => {
+    expect(drawResult(['Ana'], 1, () => 0)).toEqual({
+      type: 'error',
+      message: 'Se necesitan al menos 2 participantes para sortear 1 ganador(es).',
+    });
   });
 });
