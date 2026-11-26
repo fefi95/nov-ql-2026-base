@@ -6,6 +6,7 @@ Winner selector: a frontend-only web app where the user adds participants and dr
 
 - The base UI color is orange. It is chosen by the developer, never by the end user, and is defined as CSS variables at the top of `src/app.css`. Change the theme only there.
 - Specs live in `openspec/` (`spec-driven` schema). Write all OpenSpec artifacts in Spanish, keeping the structural headings and `SHALL`/`MUST` keywords in English.
+- **Every new change is specified first with OpenSpec**, before writing code: `/openspec-propose` → review → `/openspec-apply-change` → `/openspec-archive-change`. Do not implement a change that has no OpenSpec proposal.
 
 ## Commands
 
@@ -16,7 +17,9 @@ Requires Node.js >= 22.20.0.
 - `npm run build`: production build into `dist/`
 - `npm run preview`: serve the production build
 
-There is no test or lint script yet. When one is added, document it here.
+- `npm test`: run the test suite once (Vitest + Testing Library, jsdom)
+
+There is no lint script yet. When one is added, document it here.
 
 ## Code design
 
